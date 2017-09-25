@@ -5,8 +5,8 @@ import maze.Maze;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Random;
+import java.util.Stack;
 
 /**
  * Implement maze generator by using
@@ -45,10 +45,9 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 	public void generateMaze(Maze maze) {
 		random = new Random(System.currentTimeMillis());
 		
-		Queue<Cell> traversalOrder = new LinkedList<Cell>();
-		ArrayList<Cell> neighbours = new ArrayList<Cell>();
+		Stack<Cell> traversalOrder = new Stack<Cell>();
 		
-		recursiveDFS(maze, maze.entrance, traversalOrder, neighbours);
+		recursiveDFS(maze, maze.entrance, traversalOrder);
 
 	} // end of generateMaze()
 	
@@ -80,55 +79,64 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
      * @param traversalOrder LinkedList of cells, stored in the order they were visited so far in the
      *      DFS traversal.
      */
-	private void recursiveDFS(Maze maze, Cell current, Queue<Cell> traversalOrder, ArrayList<Cell> neighbours)
+	private void recursiveDFS(Maze maze, Cell current, Stack<Cell> traversalOrder)
 	{		
-		//add current into traversalOrder
-		traversalOrder.add(current);
 		System.out.println("Visited :" + current);
 		
 		//mark as visited
 		current.visited = true;
 		
-		//add current's neighbours into arraylist
-		int number = current.neigh.length;
-		for(int i=0 ; i<number ; i++)
+		Cell randomCell = null;
+		ArrayList<Cell> unvisited = checkAllVisited(current.neigh);
+		if(unvisited.size() > 0)
 		{
-			Cell neighbour = current.neigh[i];
-			if(neighbour != null && neighbour.visited == false)
-				neighbours.add(current.neigh[i]);
+			//add current into traversalOrder
+	      	traversalOrder.push(current);
+	      	
+			//pick a random starting cell
+			randomCell = unvisited.get(random.nextInt(unvisited.size()));
+	      	
+	      	//remove the wall
+	        for(int i=0 ; i<current.wall.length ; i++)
+	        {
+	        	for(int j=0 ; j<randomCell.wall.length ; j++)
+	        	{
+	        		if(current.wall[i] != null &&
+	        		   randomCell.wall[j] != null &&
+	        		   current.wall[i].equals(randomCell.wall[j]))
+	        		{
+	        			//remove walls
+	        			current.wall[i].present = false;
+	        			randomCell.wall[j].present = false;
+	        		}
+	        	}
+	        }
 		}
-		
-		//pick a random starting cell
-        Cell randomCell = neighbours.get(random.nextInt(neighbours.size()));
-        
-        //remove the wall
-        for(int i=0 ; i<current.wall.length ; i++)
-        {
-        	for(int j=0 ; j<randomCell.wall.length ; j++)
-        	{
-        		if(current.wall[i] != null &&
-        		   randomCell.wall[j] != null &&
-        		   current.wall[i].equals(randomCell.wall[j]))
-        		{
-        			//remove walls
-        			current.wall[i].present = false;
-        			randomCell.wall[j].present = false;
-        		}
-        	}
-        }
-        
-        //remove from neighbours
-      	neighbours.remove(randomCell);
+		else
+		{
+			//trace back
+			randomCell = traversalOrder.pop();
+		}
       	
         //recursive
-        for(int i=0 ; i<maze.sizeR ; i++)
+        if(!traversalOrder.isEmpty())
         {
-        	for(int j=0 ; j<maze.sizeC ; j++)
-        	{
-        		if(!maze.map[i][j].visited)
-        			recursiveDFS(maze, randomCell, traversalOrder, neighbours);
-        	}
+        	recursiveDFS(maze, randomCell, traversalOrder);
         }
+	}
+	
+	private ArrayList<Cell> checkAllVisited(Cell[] neighbours)
+	{
+		ArrayList<Cell> unvisited = new ArrayList<Cell>();
+		for(int i=0 ; i<neighbours.length ; i++)
+		{
+			if(neighbours[i] == null)
+				continue;
+			
+			if(!neighbours[i].visited)
+				unvisited.add(neighbours[i]);
+		}
+		return unvisited;
 	}
 
 } // end of class RecursiveBacktrackerGenerator
