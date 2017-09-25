@@ -20,6 +20,11 @@ public class Cell {
 	public int c;
 	
 	/**
+	 * visited
+	 */
+	public boolean visited;
+	
+	/**
 	 * wall[i] is the wall on direction i of the cell
 	 */
 	public Wall wall[] = {null, null, null, null, null, null};
@@ -42,6 +47,7 @@ public class Cell {
 	public Cell(int r, int c) {
 		this.r = r;
 		this.c = c;
+		this.visited = false;
 	} // end of Cell()
 	
 	/**
