@@ -1,16 +1,32 @@
 package mazeGenerator;
 
+import maze.Cell;
+import maze.Maze;
+
 import java.util.ArrayList;
 import java.util.Random;
 
-import maze.*;
+/**
+ * Generates a maze using a modified version of Prim's Algorithm.
+ * <p>
+ * MODIFIED PRIM'S ALGORITHM (from assignment specification):
+ * 1. Pick a random starting cell and add it to set Z (initially Z is empty, after addition it contains
+ * just the starting cell). Put all neighbouring cells of starting cell into the frontier set F.
+ * 2. Randomly select a cell c from the frontier set and remove it from F. Randomly select a cell b
+ * that is in Z and adjacent to the cell c. Carve a path between c and b.
+ * 3. Add cell c to the set Z. Add the neighbours of cell c to the frontier set F.
+ * 4. Repeat step 2 until Z includes every cell in the maze. At the end of the process, we have
+ * generated a perfect maze.
+ *
+ * @param maze Input maze
+ * @author Lettisia George
+ */
 
 public class ModifiedPrimsGenerator implements MazeGenerator {
-    private Random random;
 
     @Override
     public void generateMaze(Maze maze) {
-        random = new Random(System.currentTimeMillis());
+        Random random = new Random(System.currentTimeMillis());
 
         // if tunnel, do nothing
         if (maze.type == Maze.TUNNEL) {
@@ -23,11 +39,11 @@ public class ModifiedPrimsGenerator implements MazeGenerator {
         ArrayList<Cell> theRest = new ArrayList<>();
 
         // If hex maze use larger column index if rectangular use number of columns
-        int maxCol = maze.type == Maze.HEX ? ((maze.sizeC + 1) / 2 + maze.sizeC) : maze.sizeC;
+        int maxCol = maze.type == Maze.HEX ? ((maze.sizeR + 1) / 2 + maze.sizeC) : maze.sizeC;
 
         // add all cells to theRest
-        for (int i = 0; i < maze.sizeR; i++) {
-            for (int j = 0; j < maxCol; j++) {
+        for (int j = 0; j < maxCol; j++) {
+            for (int i = 0; i < maze.sizeR; i++) {
                 if (maze.map[i][j] != null) {
                     theRest.add(maze.map[i][j]);
                 }
