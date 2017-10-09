@@ -68,7 +68,7 @@ public class ModifiedPrimsGenerator implements MazeGenerator {
         while (theRest.size() > 0 || frontier.size() > 0) {
             // randomly select a non-null cell from frontier
             Cell newCell = frontier.get(random.nextInt(frontier.size()));
-            System.out.println("newCell: " + newCell);
+            //System.out.println("newCell: " + newCell);
 
             // find the cells in done that are adjacent to newCell
             ArrayList<Cell> adj = new ArrayList<>();
