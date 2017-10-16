@@ -27,14 +27,16 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
      * Input: Maze maze, starting entrance cell
      * OUTPUT : Maze maze with its cell marked with consecutive integers in the order they were visited/processed.
      * 
-     * 1: traversalOrder = {}
-     * // mark all vertices unvisited
+     * 1: traversalOrder = {entrance}
+     * // add all unvisited cells into the unVisitedCells ArrayList
      * 2: for i = 0 to row do
      * 3:    for j = 0 to col do
-     * 4:    marked[ i ][ j ] = false
-     * 5: end for
+     * 4:    	if(!maze.map[i][j].visited)
+     * 5:				unvisited.add(maze.map[i][j]);
+     * 6: end for
      * // initiate DFS from entrance cell 
-     * 6: DFSR (entrance, traversalOrder)
+     * 7: while loop terminate condition: when unVisitedCells is none
+     * 8: recursiveDFS (unVisitedCells, traversalOrder)
      * 
      * ******************************************************************************************
      * 
@@ -51,41 +53,38 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 		//pick entrance as the starting order
 		traversalOrder.push(maze.entrance);
 		
-		boolean terminate = false;
+		boolean result = false;
 		while(unVisitedCells.size() > 0)
-			terminate = recursiveDFS(unVisitedCells, traversalOrder);
+			result = backtracker(unVisitedCells, traversalOrder);
 
 	} // end of generateMaze()
 	
 	
 	/**
-     * Recursive DFS method, that implements DFS visitation semantics.
+     * backtracker method, that implements DFS visitation semantics.
      * 
      * ******************************************************************************************
      * 
-     * ALGORITHM DFSR(current, traversalOrder)
-     * Recursively visit all connected vertices.
-     * INPUT: A seed/starting cell, array of cell visited, traversal order of cell visited so far
+     * INPUT: A seed/starting cell, array of cell unvisited, traversal order of cell visited so far
      * OUTPUT : None
      * 
-     * 1: traversalOrder.add(current)
-     * 2: visited[cell.Row][cell.Col] = true
-     * 3: for neighbour(cell) do
-     * 4:     if not marked[ w ] then
-     * 5:         DFSR (w, traversalOrder)
-     * 6:     end if
-     * 7: end for
+     * 1: current.visited = true
+     * 2: remove current cell from unVisitedCells
+     * 3: if traversalOrder is not empty
+     * 4: 	pick next random cell
+     * 5: 	remove the connected walls
+     * 6:  	push the next cell into stack for visiting next
+     * 7: else
+     * 8:   pop the stack for checking the previous cell
      * 
      * ******************************************************************************************
      * 
-     * @param maze Input Maze.
-     * @param cell Current cell visited.
-     * @param marked Array of booleans, that indicate whether a vertex has been
-     *      visited yet.
-     * @param traversalOrder LinkedList of cells, stored in the order they were visited so far in the
+     * @param unVisitedCells LinkedList of cells
+     * @param traversalOrder Stack of cells, stored in the order they were visited so far in the
      *      DFS traversal.
+     * @return boolean value
      */
-	private boolean recursiveDFS(ArrayList<Cell> unVisitedCells, Stack<Cell> traversalOrder)
+	private boolean backtracker(ArrayList<Cell> unVisitedCells, Stack<Cell> traversalOrder)
 	{
 		if(traversalOrder.isEmpty())
 			return true;

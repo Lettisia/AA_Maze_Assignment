@@ -22,7 +22,7 @@ import maze.Wall;
  * 		go back the previous cell to check available path
  * else
  * 		pick the next cell for visiting
- * end
+ * end while
  */
 
 public class WallFollowerSolver implements MazeSolver {
