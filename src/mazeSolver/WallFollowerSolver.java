@@ -15,6 +15,14 @@ import maze.Wall;
  * Finding the exit could be done just by 
  * keeping one of your hands always touching a wall.
  * 
+ * pseudo code
+ * while(current cell not match the exit cell)
+ * do
+ * if(current cell is in the dead end)
+ * 		go back the previous cell to check available path
+ * else
+ * 		pick the next cell for visiting
+ * end
  */
 
 public class WallFollowerSolver implements MazeSolver {
@@ -46,6 +54,9 @@ public class WallFollowerSolver implements MazeSolver {
 
 	} // end of solveMaze()
 	
+	/**
+     * Mark each cell in the maze to be unvisited
+     */
 	private void setCellsVisitedValueAsDefault()
 	{
 		int row = maze.sizeR;
@@ -61,6 +72,20 @@ public class WallFollowerSolver implements MazeSolver {
 		}
 	} // end of setCellsVisitedValueAsDefault()
 	
+	/**
+	 * boolean wallFollower()
+     * print footprint on the current cell
+     * validation the current cell
+     * if the current cell is exit cell 
+     * will return true to terminate while loop
+     * otherwise, keeping traverse the next cell
+     * 
+     * next cell picking rule:
+     * if enter to dead end then go previous cell
+     * else pick the next cell to do next iteration
+     * 
+     * @return true to terminate while loop
+     */
 	private boolean wallFollower()
 	{
 		Cell current = traverseOrder.peek();
@@ -89,6 +114,12 @@ public class WallFollowerSolver implements MazeSolver {
 		return false;
 	}
 	
+	/**
+	 * boolean isDeadEnd()
+     * check the current cell is in the dead end or not
+     * 
+     * @return true to pop the stack
+     */
 	private boolean isDeadEnd(Cell current)
 	{
 		//check available paths
@@ -105,6 +136,16 @@ public class WallFollowerSolver implements MazeSolver {
 		return true;
 	}
 	
+	/**
+	 * Cell checkNextPath(Cell current)
+     * get the next cell for visiting
+     * because the East direction index is 0
+     * therefore the first priority is go East
+     * which is follow the right hand rule
+     * 
+     * @param Cell current
+     * @return neigh cell for next visiting
+     */
 	private Cell checkNextPath(Cell current)
 	{
 		Cell cell = null;
