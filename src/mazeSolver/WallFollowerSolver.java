@@ -49,8 +49,9 @@ public class WallFollowerSolver implements MazeSolver {
 		//pick entrance as the first traverse cell
 		traverseOrder.push(maze.entrance);
 		
+		boolean result = false;
 		while(!isSolved)
-			isSolved = wallFollower();
+			result = wallFollower();
 
 	} // end of solveMaze()
 	
@@ -88,6 +89,9 @@ public class WallFollowerSolver implements MazeSolver {
      */
 	private boolean wallFollower()
 	{
+		if(traverseOrder.isEmpty())
+			return true;
+		
 		Cell current = traverseOrder.peek();
 		maze.drawFtPrt(current);
 		
@@ -99,7 +103,10 @@ public class WallFollowerSolver implements MazeSolver {
 		//count cellsExplored
 		cellsExplored++;
 		if(current == maze.exit)
+		{
+			isSolved = true;
 			return true;
+		}
 		
 		//check the cell is in the dead end or not
 		boolean isDeadEnd = isDeadEnd(current);
@@ -126,6 +133,9 @@ public class WallFollowerSolver implements MazeSolver {
 		int wallSize = current.wall.length;
 		for(int i=0 ; i<wallSize ; i++)
 		{
+			if(current.tunnelTo != null && !current.tunnelTo.visited)
+				return false;
+			
 			if(current.wall[i] == null)
 				continue;
 			
@@ -150,6 +160,11 @@ public class WallFollowerSolver implements MazeSolver {
 	{
 		Cell cell = null;
 		Wall wall = null;
+		
+		//check the tunnel cell
+		//if haven't visited then pick as next cell
+		if(current.tunnelTo != null && !current.tunnelTo.visited)
+			return current.tunnelTo;
 		
 		//check the most right path first
 		//East direction
