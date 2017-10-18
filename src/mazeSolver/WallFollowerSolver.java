@@ -1,6 +1,7 @@
 package mazeSolver;
 
 import maze.Cell;
+import maze.HexMaze;
 import maze.Maze;
 import maze.Wall;
 
@@ -26,15 +27,18 @@ import java.util.Stack;
  */
 
 public class WallFollowerSolver implements MazeSolver {
+	private final static int DEFAULT_DIRECTION = -1;
     private final Stack<Cell> traverseOrder;
     private boolean isSolved;
     private int cellsExplored;
     private Maze maze;
+    private int pathDirection;
 
     public WallFollowerSolver() {
         this.maze = null;
         this.isSolved = false;
         this.cellsExplored = 0;
+        this.pathDirection = DEFAULT_DIRECTION;
         this.traverseOrder = new Stack<>();
     }
 
@@ -153,13 +157,32 @@ public class WallFollowerSolver implements MazeSolver {
         if (current.tunnelTo != null && !current.tunnelTo.visited)
             return current.tunnelTo;
 
-        //check the most right path first
-        //East direction
+        //check the East direction first
+        int currentR = current.r;
+        int currentC = current.c;
+        int deltaR = maze.deltaR[Maze.EAST];
+        int deltaC = maze.deltaC[Maze.EAST];
+        //boundary check
+        if((currentR + deltaR < maze.sizeR && currentR + deltaR >= 0) &&
+           (currentC + deltaC < maze.sizeC && currentC + deltaC >= 0))
+        {
+        	cell = maze.map[currentR + deltaR][currentC + deltaC];
+            if(!cell.visited)
+            {
+            	//check the wall is not present
+            	for(int i=0 ; i<current.neigh.length ; i++)
+            	{
+            		if(current.neigh[i] == null)
+            			continue;
+            		
+            		if(current.neigh[i] == cell && !current.wall[i].present)
+            			return cell;
+            	}
+            }
+        }	
+        
         int wallSize = current.wall.length;
-
         //choose the available path
-        //would check East direction first
-        //because Maze.East index is 0
         for (int i = 0; i < wallSize; i++) {
             cell = current.neigh[i];
             wall = current.wall[i];
@@ -168,7 +191,10 @@ public class WallFollowerSolver implements MazeSolver {
                 continue;
 
             if (!current.wall[i].present && !current.neigh[i].visited)
+            {
+            	pathDirection = i;
                 return cell;
+            }
         }
 
         return cell;
