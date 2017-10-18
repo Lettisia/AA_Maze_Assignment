@@ -70,7 +70,7 @@ public class WallFollowerSolver implements MazeSolver {
      */
     private void setCellsVisitedValueAsDefault() {
         int row = maze.sizeR;
-        int col = maze.sizeC;
+        int col = maze.type == Maze.HEX ? ((maze.sizeR + 1) / 2 + maze.sizeC) : maze.sizeC;
 
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
@@ -135,7 +135,7 @@ public class WallFollowerSolver implements MazeSolver {
             if (current.tunnelTo != null && !current.tunnelTo.visited)
                 return false;
 
-            if (current.wall[i] == null)
+            if (current.wall[i] == null || current.neigh[i] == null)
                 continue;
 
             if (!current.wall[i].present) {

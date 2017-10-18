@@ -149,8 +149,9 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
 
     private ArrayList<Cell> checkAllVisited(Maze maze) {
         ArrayList<Cell> unvisited = new ArrayList<>();
+        int numCol = maze.type == Maze.HEX ? ((maze.sizeR + 1) / 2 + maze.sizeC) : maze.sizeC;
         for (int i = 0; i < maze.sizeR; i++) {
-            for (int j = 0; j < maze.sizeC; j++) {
+            for (int j = 0; j < numCol; j++) {
                 if (maze.map[i][j] == null)
                     continue;
 
