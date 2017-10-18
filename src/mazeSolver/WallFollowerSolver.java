@@ -1,7 +1,6 @@
 package mazeSolver;
 
 import maze.Cell;
-import maze.HexMaze;
 import maze.Maze;
 import maze.Wall;
 
@@ -27,20 +26,20 @@ import java.util.Stack;
  */
 
 public class WallFollowerSolver implements MazeSolver {
-	private final static int DEFAULT_DIRECTION = -1;
+    private final static int DEFAULT_DIRECTION = -1;
     private final Stack<Cell> traverseOrder;
     private boolean isSolved;
     private int cellsExplored;
     private Maze maze;
     private int pathDirection;
-    //for different direction
-    public final static int NouthDir[] = { 0, 1, 2, 3, 4, 5 };
-    public final static int NouthEastDir[] = { 1, 2, 3, 4, 5, 0 };
-    public final static int SouthEastDir[] = { 2, 3, 4, 5, 0, 1 };
-    public final static int SouthDir[] = { 3, 4, 5, 0, 1, 2 };
-    public final static int SouthWastDir[] = { 4, 5, 0, 1, 2, 3 };
-    public final static int NouthWastDir[] = { 5, 0, 1, 2, 3, 4 };
-    
+    //for different directions
+    private final static int FacingNorthWest[] = {0, 1, 2, 3, 4, 5}; //2
+    private final static int FacingWest[] = {1, 2, 3, 4, 5, 0}; //3
+    private final static int FacingSouthWest[] = {2, 3, 4, 5, 0, 1}; //4
+    private final static int FacingSouthEast[] = {3, 4, 5, 0, 1, 2}; //5
+    private final static int FacingEast[] = {4, 5, 0, 1, 2, 3}; //0
+    private final static int FacingNorthEast[] = {5, 0, 1, 2, 3, 4}; //1
+
 
     public WallFollowerSolver() {
         this.maze = null;
@@ -90,8 +89,8 @@ public class WallFollowerSolver implements MazeSolver {
      * otherwise, keeping traverse the next cell
      *
      * next cell picking rule:
-     *   if enter to dead end then go previous cell
-     *   else pick the next cell to do next iteration
+     * if enter to dead end then go previous cell
+     * else pick the next cell to do next iteration
      */
     private void wallFollower() {
         if (traverseOrder.isEmpty())
@@ -139,8 +138,11 @@ public class WallFollowerSolver implements MazeSolver {
             if (current.wall[i] == null)
                 continue;
 
-            if (!current.wall[i].present && !current.neigh[i].visited)
-                return false;
+            if (!current.wall[i].present) {
+                if (!current.neigh[i].visited) {
+                    return false;
+                }
+            }
         }
 
         return true;
@@ -148,10 +150,8 @@ public class WallFollowerSolver implements MazeSolver {
 
     /**
      * Cell checkNextPath(Cell current)
-     * get the next cell for visiting
-     * because the East direction index is 0
-     * therefore the first priority is go East
-     * which is follow the right hand rule
+     * get the next cell for visiting which is follow the right hand rule based
+     * on current path direction
      *
      * @param current cell
      * @return neigh cell for next visiting
@@ -168,44 +168,44 @@ public class WallFollowerSolver implements MazeSolver {
         //check the direction first
         int wallSize = current.wall.length;
         int[] dir = new int[wallSize];
-        switch(pathDirection)
-        {
-	        case Maze.EAST:
-	        	dir = SouthWastDir;
-	        	break;
-	        case Maze.NORTHEAST:
-	        	dir = NouthWastDir;
-	        	break;
-	        case Maze.NORTHWEST:
-	        	dir = NouthDir;
-	        	break;
-	        case Maze.WEST:
-	        	dir = NouthEastDir;
-	        	break;
-	        case Maze.SOUTHWEST:
-	        	dir = SouthEastDir;
-	        	break;
-	        case Maze.SOUTHEAST:
-	        	dir = SouthDir;
-	        	break;
-	        case DEFAULT_DIRECTION:
-	        	dir = NouthDir;
-	        	break;
+        //order to check directions
+        switch (pathDirection) {
+            // which way is right if i'm facing east? check that way first
+            case Maze.EAST: // 0
+                dir = FacingEast;
+                break;
+            case Maze.NORTHEAST: // 1
+                dir = FacingNorthEast;
+                break;
+            case Maze.NORTHWEST: // 2
+                dir = FacingNorthWest;
+                break;
+            case Maze.WEST: // 3
+                dir = FacingWest;
+                break;
+            case Maze.SOUTHWEST: // 4
+                dir = FacingSouthWest;
+                break;
+            case Maze.SOUTHEAST: // 5
+                dir = FacingSouthEast;
+                break;
+            case DEFAULT_DIRECTION:
+                dir = FacingNorthWest;
+                break;
         }
-        
-        
+
+
         //choose the available path
         for (int i = 0; i < wallSize; i++) {
-        	int index = dir[i];
+            int index = dir[i];
             cell = current.neigh[index];
             wall = current.wall[index];
 
             if (cell == null || wall == null)
                 continue;
 
-            if (!current.wall[index].present && !current.neigh[index].visited)
-            {
-            	pathDirection = index;
+            if (!current.wall[index].present && !current.neigh[index].visited) {
+                pathDirection = index;
                 return cell;
             }
         }
