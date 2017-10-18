@@ -16,14 +16,14 @@ public interface MazeSolver {
 	 * @param maze
 	 *            The maze to solve.
 	 */
-	public abstract void solveMaze(Maze maze);
+	void solveMaze(Maze maze);
 
 	/**
 	 * Use after solveMaze(maze), to check whether the maze is solved.
 	 * 
 	 * @return True if solved. Otherwise false.
 	 */
-	public abstract boolean isSolved();
+	boolean isSolved();
 
 	/**
 	 * Use after solveMaze(maze), counting the number of cells explored in
@@ -32,5 +32,5 @@ public interface MazeSolver {
 	 * @return The number of cells explored. It is not required to be accurate
 	 *         and no marks are given (or lost) on it.
 	 */
-	public abstract int cellsExplored();
+	int cellsExplored();
 } // end of interface mazeGenerator

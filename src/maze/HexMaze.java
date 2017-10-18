@@ -1,8 +1,8 @@
 package maze;
 
-import java.util.*;
-
-import maze.StdDraw;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 /**
  * Class of hexagon maze.
@@ -26,9 +26,7 @@ public class HexMaze extends NormalMaze {
 	
 	@Override
 	public boolean isOnEdge(int r, int c) {
-		if (isIn(r, c + (r + 1) / 2) && (r == 0 || r == sizeR - 1 || c == 0 || c == sizeC - 1)) 
-			return true;
-		return false;
+		return isIn(r, c + (r + 1) / 2) && (r == 0 || r == sizeR - 1 || c == 0 || c == sizeC - 1);
 	} // end of isOnEdge()
 	
 	

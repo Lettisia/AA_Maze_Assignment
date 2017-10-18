@@ -8,47 +8,49 @@ import java.util.Stack;
 /**
  * Implements the BiDirectional recursive backtracking maze solving algorithm.
  *
- * @author Lettisia George - 07-10-2017
- * <p>
+ * @author Lettisia George
+ *
  * ALGORITHM Recursive Backtracker Solver / DFS
  * Solve the maze by performing a depth first search traversal of a maze from both
- * the entrance and exit.
- * Stop when two paths meet.
- * Input: Maze maze, starting entrance cell and exit cell
- * Output: Maze maze with its cell marked with consecutive integers in the order
- * they were visited/processed.
- * <p>
+ * the entrance and exit. Stop when two paths meet.
+ *
+ * Input: Maze maze, entrance cell and exit cell
+ * Output: Maze maze with its cell marked with footprints.
+ *
  * traversalOrder = {}
  * // mark all vertices unvisited
  * for i = 0 to row do
- * for j = 0 to col do
- * marked[i][j] = false
+ *   for j = 0 to col do
+ *     marked[i][j] = false
+ *   end for
  * end for
  * // initiate DFS from entrance cell and exit cell
  * add entrance and exit to separate stacks
  * while !pathsCross
- * for each of next cells in entrance and exit traversal stacks
- * for i = 0 to maze.NUMDIR
- * select a neighbouring cell to the current cell
- * if (visited)
- * if (neighbour is a member of stack from other direction)
- * pathsCross = true
- * end if
- * end if
- * if (!visited)
- * add neighbour to correct stack
- * visited = true
- * break
- * end if
- * end for
+ *   for each of next cell in entrance traversal stack and next cell in exit traversal stack
+ *     for i = 0 to maze.NUMDIR
+ *       select cell i from the neighbouring cells to the current cell
+ *       if (visited)
+ *         if (neighbour is a member of stack from other direction)
+ *           pathsCross = true
+ *         end if
+ *       else // not visited
+ *         add neighbour to correct stack
+ *         visited = true
+ *         mark footprint
+ *         break
+ *       end if
+ *     end for
+ *   end for
  * end while
+ *
  */
 public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
     private Maze maze = null;
     private boolean solved = false;
     private int cellsExplored = 0;
-    private Stack<Cell> traverseFromStart = new Stack<>();
-    private Stack<Cell> traverseFromEnd = new Stack<>();
+    private final Stack<Cell> traverseFromStart = new Stack<>();
+    private final Stack<Cell> traverseFromEnd = new Stack<>();
 
 
     @Override
@@ -57,7 +59,6 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
 
         // Mark all cells as unvisited
         markCellsUnvisited();
-
         // Start with the entrance and exit
         Cell entrance = maze.entrance;
         Cell exit = maze.exit;
@@ -103,46 +104,57 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
         Cell nextEntrance = null;
 
         if (maze.type == Maze.TUNNEL && entrance.tunnelTo != null) {
-            if (entrance.tunnelTo.visited) {
-                done = otherDirection.contains(entrance.tunnelTo);
+            if (!entrance.tunnelTo.visited) {
+                // go immediately to the new cell
+                entrance = entrance.tunnelTo;
+                // add it to the stack
+                sameDirection.push(entrance);
+                // set it as visited
+                entrance.visited = true;
+                // draw a foot print
+                maze.drawFtPrt(entrance);
+                // increment the cells explored
+                cellsExplored++;
             } else {
-                sameDirection.push(entrance.tunnelTo);
-            }
-        } else {
-
-            // Loop through each direction looking for unvisited cells
-            for (int i = 0; i < Maze.NUM_DIR && nextEntrance == null; i++) {
-                // Cells must be not null and there must be no wall
-                if (entrance.neigh[i] != null && !entrance.wall[i].present) {
-                    // If the cell is not visited we select it as the next cell
-                    if (!entrance.neigh[i].visited) {
-                        // select the neighbour of entrance in direction i
-                        nextEntrance = entrance.neigh[i];
-                        // add to the appropriate stack
-                        sameDirection.push(nextEntrance);
-                        // Mark the new cell as visited
-                        nextEntrance.visited = true;
-                        // increment the number of cells explored
-                        cellsExplored++;
-                        // Add a footprint to the maze
-                        maze.drawFtPrt(nextEntrance);
-                    } else {
-                        // If the cell has been visited check if it is part of the
-                        // solution found from the other end and stop if it is
-                        done = done || otherDirection.contains(entrance.neigh[i]);
-                    }
-                }
-            }
-            // If no unvisited cell was found remove current cell from stack
-            if (nextEntrance == null) {
-                sameDirection.pop();
+                // check if the maze is solved
+                done = otherDirection.contains(entrance.tunnelTo);
             }
         }
+
+
+        // Loop through each direction looking for unvisited cells
+        for (int i = 0; i < Maze.NUM_DIR && nextEntrance == null; i++) {
+            // Cells must be not null and there must be no wall
+            if (entrance.neigh[i] != null && !entrance.wall[i].present) {
+                // If the cell is not visited we select it as the next cell
+                if (!entrance.neigh[i].visited) {
+                    // select the neighbour of entrance in direction i
+                    nextEntrance = entrance.neigh[i];
+                    // add to the appropriate stack
+                    sameDirection.push(nextEntrance);
+                    // Mark the new cell as visited
+                    nextEntrance.visited = true;
+                    // increment the number of cells explored
+                    cellsExplored++;
+                    // Add a footprint to the maze
+                    maze.drawFtPrt(nextEntrance);
+                } else {
+                    // If the cell has been visited check if it is part of the
+                    // solution found from the other end and stop if it is
+                    done = done || otherDirection.contains(entrance.neigh[i]);
+                }
+            }
+        }
+        // If no unvisited cell was found remove current cell from stack
+        if (nextEntrance == null) {
+            sameDirection.pop();
+        }
+
         return done;
     }
 
     /**
-     * Mark each cell in the maze to unvisited
+     * Mark each cell in the maze as unvisited
      */
     private void markCellsUnvisited() {
         // Setup special number of columns for hex mazes

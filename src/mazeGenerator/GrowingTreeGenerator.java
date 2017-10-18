@@ -6,13 +6,32 @@ import maze.Maze;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Growing tree maze generator. As it is very general, here we implement as
+ * "usually pick the most recent cell, but occasionally pick a random cell"
+ * <p>
+ * Algorithm: (from assignment specification)
+ * 1. Pick a random starting cell and add it to set Z (initially Z is empty,
+ * after addition it contains just the starting cell).
+ * 2. Using a particular strategy (see below) select a cell b from Z. If cell
+ * b has unvisited neighbouring cells, randomly select a neighbour, carve a
+ * path to it, and add the selected neighbour to set Z.
+ * If b has no unvisited neighbours, remove it from Z.
+ * 3. Repeat step 2 until Z is empty.
+ * <p>
+ * The strategy:
+ * A. With a probability of threshold select a random cell from those already
+ * visited.
+ * B. With a probability of 1-threshold select the last cell marked.
+ *
+ * @author Lettisia George
+ */
+
 public class GrowingTreeGenerator implements MazeGenerator {
-	// Growing tree maze generator. As it is very general, here we implement as "usually pick the most recent cell, but occasionally pick a random cell"
-	
-	double threshold = 0.1;
-	
-	@Override
-	public void generateMaze(Maze maze) {
+    //
+
+    @Override
+    public void generateMaze(Maze maze) {
         Random random = new Random(System.currentTimeMillis());
 
         // if tunnel, do nothing
@@ -50,6 +69,7 @@ public class GrowingTreeGenerator implements MazeGenerator {
         // while unmarked is not empty
         while (unmarked.size() > 0) {
             // Select the last cell most of the time but sometimes select a random cell
+            double threshold = 0.1;
             if (random.nextDouble() < threshold) {
                 // Select random cell from marked
                 nextCell = marked.get(random.nextInt(marked.size()));
